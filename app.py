@@ -15,7 +15,11 @@ def get_input():
     username = name.get()
     print(username)
 
-get_input_button = tk.Button(window, text = 'Submit', command = get_input())
+def print_shalom():
+    print('Shalom')
+
+get_input_button = tk.Button(window, text = 'Submit', command = print_shalom())
+
 get_input_button.pack()
 greeting.pack()
 
