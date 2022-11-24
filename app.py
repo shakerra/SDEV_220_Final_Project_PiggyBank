@@ -10,8 +10,8 @@ from classes.account import Account
 
 #styling variables
 #colors
-c_dark = '#121212'
-c_purp = '#3700B3'
+c_dark  = '#121212'
+c_purp  = '#3700B3'
 c_error = '#CF6679'
 c_black = '#000000'
 c_white = '#FFFFFF'
@@ -21,7 +21,7 @@ c_white = '#FFFFFF'
 name = ''
 
 #bank of choice
-bank = ''
+bank = {}
 
 #current user, object derived from "User" class in /classes/user.py and initialized in BankPage class
 current_user = {}
@@ -42,6 +42,7 @@ class App(tk.Tk):
             page_name = F.__name__
             frame = F(parent = container, controller = self)
             self.frames[page_name] = frame
+            print(current_user)
 
             # put all of the pages in the same location;
             # the one on the top of the stacking order
@@ -52,6 +53,10 @@ class App(tk.Tk):
 
     def show_frame(self, page_name):
         frame = self.frames[page_name]
+        if(current_user != {}):
+            print(current_user)
+        else:
+            print('No value assigned to current user yet')
         frame.tkraise()
 
 class WelcomePage(tk.Frame):
@@ -65,7 +70,6 @@ class WelcomePage(tk.Frame):
             if(f_name != ''):
                 if(l_name != ''):
                     name = f"{f_name} {l_name}"
-                    print(name)
                     controller.show_frame('BankPage')
                 else:
                     messagebox.showwarning(title = 'Nope', message = 'Please enter your last name')
@@ -73,7 +77,8 @@ class WelcomePage(tk.Frame):
                 messagebox.showwarning(title = 'Nope', message = 'Please enter your first name')
             return
 
-        label = tk.Label(self, text = 'Welcome To BanKids. Enter your name to get started!').pack(side = 'top', fill = 'x', pady = 10)
+        label = tk.Label(self, text = 'Welcome To BanKids. Enter your name to get started!')
+        label.pack(side = 'top', fill = 'x', pady = 10)
 
         #input boxes for first and last name
         f_name_label = tk.Label(self, text = 'First name')
@@ -108,11 +113,9 @@ class BankPage(tk.Frame):
                 bank = selected_bank
                 #create instance of 'Account' class with a starting balance of 500.00
                 checking_account = Account(float(500.00), 'checking', bank)
-                current_user = User(name, 18, checking_account)
+                global current_user
+                current_user = User(name, checking_account)
 
-                #prints for testing
-                checking_account.print_account_info()
-                print(current_user.printInfo())
                 print(selected_bank)
                 controller.show_frame('YourAccountPage')
             else:
@@ -139,46 +142,56 @@ class YourAccountPage(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
+        def transact(transaction):
+            #amt = withdrawal_input.get()
+            msg = ''
+            if(transaction == 2):
+                #msg = current_user.checking_account.get_balance()
+                #tk.messagebox.showinfo(title = 'Your balance', message = msg)
+                if(hasattr(current_user, 'account')):
+                    print(current_user.account.get_balance())
+                else:
+                    print('Current user does not have attribute account')
+                print('User selected balance check')
+            #if user selected withdraw or depost
+            else:
+                if(hasattr(current_user, 'account')):
+                    msg = current_user.account.set_balance(transaction, 20.50)
+                    tk.messagebox.showinfo(title = 'You Made A Transaction!', message = f'Your new balance is {msg}')
+                    print(current_user.account.get_balance())
+                else:
+                    print('Current user does not have attribute account')
+                print('User selected something else')
+
         label = tk.Label(self, text = f'Hello {name}, what would you like to do with your account?')
         label.pack(side = 'top', fill = 'x', pady = 10)
 
         #withdraw button
-        w_button = tk.Button(self, bg = '#3F51B5', foreground = '#ffffff', text = 'Withdraw', command = transact(0)).pack(pady = 10)
+        w_button = tk.Button(self, bg = '#3F51B5', foreground = '#ffffff', text = 'Withdraw', command = lambda: transact(1))
+        w_button.pack()
 
         #deposit button
-        d_button = tk.Button(self, pady = '10', text = 'Depost', command = transact(1)).pack(pady = '10')
+        d_button = tk.Button(self, pady = '10', text = 'Depost', command = lambda: transact(0))
+        d_button.pack()
 
         #check balance button
-        cb_button = tk.Button(self, pady = '10', text = 'Check Balance', command = check_balance).pack(pady = '10')
+        cb_button = tk.Button(self, pady = '10', text = 'Check Balance', command = lambda: transact(2))
+        cb_button.pack()
 
         #label and input fields to enter withdrawal and deposit amounts
         withdrawal_label = tk.Label(self, text = f'How much would you like to withdraw from your account?')
         withdrawal_label.pack()
         withdrawal_input = tk.Entry(self)
         withdrawal_input.pack(pady = 10)
-        withdrawal_confirm = tk.Button(self, pady = 10, text = 'Submit', command = transact(0))
+        withdrawal_confirm = tk.Button(self, pady = 10, text = 'Submit', command = lambda: transact(0))
         withdrawal_confirm.pack()
 
         deposit_label = tk.Label(self, text = f'How much would you like to deposit to your account?')
         deposit_label.pack()
         deposit_input = tk.Entry(self)
         deposit_input.pack(pady = 10)
-        deposit_confirm = tk.Button(self, pady = 10, text = 'Submit', command = transact(1))
+        deposit_confirm = tk.Button(self, pady = 10, text = 'Submit', command = lambda: transact(1))
         deposit_confirm.pack()
-
-                #show balance
-        def check_balance():
-            #store return statment from get_balance method in variable msg to use in message box
-            #See .classes.account for more info on this method
-            msg = current_user.account.get_balance();
-            tk.messagebox.showinfo(title = 'Account Balance', message = f'{msg}')
-
-        #withdraw
-        def transact(transaction):
-            amt = withdrawal_input.get()
-            msg = current_user.account.set_balance(transaction, amt)
-            if (transaction == 0):
-                tk.messagebox.showinfo(title = 'You Made A Transaction!', message = f'Your new balance is {check_balance()}')
 
 if __name__ == '__main__':
     app = App()

@@ -1,4 +1,4 @@
-#user class - temporary
+#user class
 class User:
     def __init__(self, name, account):
         self.name = name
