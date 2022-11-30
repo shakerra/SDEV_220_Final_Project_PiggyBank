@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
+from random import randint
 
 #import classes from relative files
 from classes.user import User
@@ -38,7 +39,7 @@ class App(tk.Tk):
         container.grid_columnconfigure(0, weight = 1)
 
         self.frames = {}
-        for F in (WelcomePage, BankPage, YourAccountPage):
+        for F in (WelcomePage, BankPage, YourAccountPage, AddFeatures, Flashcards, CompoundInterest):
             page_name = F.__name__
             frame = F(parent = container, controller = self)
             self.frames[page_name] = frame
@@ -196,6 +197,128 @@ class YourAccountPage(tk.Frame):
         deposit_input.pack(pady = 10)
         deposit_confirm = tk.Button(self, pady = 10, text = 'Submit', command = lambda: transact(1))
         deposit_confirm.pack()
+
+        label = tk.Label(self, text = f'Go To Additional Learning Activities')
+        label.pack(side = 'top', fill = 'x', pady=25)
+
+        activies_button = tk.Button(self, text = 'Learning Activites',
+                                    command = lambda: controller.show_frame("AddFeatures"))
+        activies_button.pack()
+
+         
+#Additional Learning Features
+class AddFeatures(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller 
+
+        label = tk.Label(self, text="Learning Activities", font=("Helvetica", 20))
+        label.pack(side="top", fill="x", pady=10)
+
+        label2 = tk.Label(self, text="Please Select An Activity")
+        label2.pack(side="top", fill="x", pady=10)
+
+        #open flashcard game
+        fc_button = tk.Button(self, text="Financial Literacy Flashcards", command= lambda: controller.show_frame("Flashcards"))
+        fc_button.pack()
+
+        #open compound interest simulator
+        CompIntb = tk.Button(self, text="Compound Interest Simulator", command= lambda: controller.show_frame("CompoundInterest"))
+        CompIntb.pack()
+
+        #return to your account
+        returnb = tk.Button(self, text = 'Go Back to Your Account',
+                                    command = lambda: controller.show_frame("YourAccountPage"))
+        returnb.pack(pady=100)
+
+#Flashcards Feature
+class Flashcards(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller 
+
+        words = [
+            (("Savings"), ("Money set aside for a specific financial goal")),
+            (("Budget"), ("A plan that you can make to keep track of your money")),
+            (("Loan"), ("Something that is borrowed, usually money, which has to be paid back with interest")),
+            (("Deposit"), ("Money placed into an account")),
+            (("Interest"), ("The cost of borrowing money, which means you end up paying back more than you borrowed")),
+            (("Credit"), ("Money given to you by a bank under the agreement that you will pay it back")),
+            (("Investment"), ("Setting aside money for future income or profit to meet long-term goals")),
+            (("Stock"), ("An investment that makes the investor a part owner of a company")),
+            (("Credit Score"), ("Your report card for how well you handle money and whether you pay your bills on time")),
+            (("Bank"), ("A for-profit company that provides saving and checking accounts and other financial services to its customers")),
+        ]
+
+        #get a count of our word list
+        count = len(words)
+
+        def next():
+            #clear the screen 
+            answer_label.config(text="")
+            my_entry.delete(0, END)
+
+            #create random selection
+            global random_word
+            random_word = randint(0, count-1)
+            #update label with literacy word
+            literacy_word.config(text=words[random_word][1])
+
+        def answer():
+            ent = my_entry.get()
+            if(ent != ''):
+                if my_entry.get().capitalize() == words[random_word][0]:
+                    answer_label.config(text=f"Correct! {words[random_word][1]} is {words[random_word][0]}", wraplength=500, justify="center")
+                else:
+                    answer_label.config(text=f"Incorrect! {words[random_word][1]} is not {my_entry.get().capitalize()}", wraplength=500, justify="center")
+            else:
+                messagebox.showwarning(title = 'Nope', message = 'Please enter an answer')
+                       
+            
+        instructions = Label(self, text="Please match the following words with the correct definition ", font=("Helvetica", 16), wraplength=700, justify="center")
+        instructions.pack(pady=10)
+        
+        word_bank = Label(self, text="Savings, Budget, Loan, Deposit, Interest, Credit, Investment, Stock, Credit score, Bank", font=("Helvetica", 10), justify="center")
+        word_bank.pack()
+        
+        literacy_word = Label(self, text="", font=("Helvetica", 12), wraplength=500, justify="center")
+        literacy_word.pack(pady=80)
+
+        my_entry = Entry(self, font=("Helvetica", 18))
+        my_entry.pack()
+
+        answer_label = Label(self, text="")
+        answer_label.pack()
+
+        #create buttons
+        button_frame = Frame(self)
+        button_frame.pack()
+
+        answer_button = Button(button_frame, text="Answer", command=answer)
+        answer_button.grid(row=0, column=0, padx=20)
+
+        next_button = Button(button_frame, text="Next", command=next)
+        next_button.grid(row=0, column=1)
+
+        #run next function when program starts
+        next()
+
+        #return to your account
+        returnb = tk.Button(self, text = 'Go Back to Learning Activities',
+                                    command = lambda: controller.show_frame("AddFeatures"))
+        returnb.pack(pady=25)
+
+#Compound Interest Feature
+class CompoundInterest(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller 
+
+        #return to your account
+        returnb = tk.Button(self, text = 'Go Back to Learning Activities',
+                                    command = lambda: controller.show_frame("AddFeatures"))
+        returnb.pack(pady=25)
 
 if __name__ == '__main__':
     app = App()
