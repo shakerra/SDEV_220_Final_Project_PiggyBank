@@ -143,7 +143,7 @@ class YourAccountPage(tk.Frame):
         self.controller = controller
 
         def transact(transaction):
-            #amt = withdrawal_input.get()
+            amt = 0
             msg = ''
             if(transaction == 2):
                 #msg = current_user.checking_account.get_balance()
@@ -155,6 +155,13 @@ class YourAccountPage(tk.Frame):
                 print('User selected balance check')
             #if user selected withdraw or depost
             else:
+                #check to see if user has entered value for withdrawal_input variable
+                if(withdrawal_input.get()):
+                    amt = withdrawal_input.get()
+                    print('Got user value for amount')
+                else:
+                    print('Error with user entered amount')
+                #check to see if user object has attribute 'account'
                 if(hasattr(current_user, 'account')):
                     msg = current_user.account.set_balance(transaction, 20.50)
                     tk.messagebox.showinfo(title = 'You Made A Transaction!', message = f'Your new balance is {msg}')
@@ -162,9 +169,6 @@ class YourAccountPage(tk.Frame):
                 else:
                     print('Current user does not have attribute account')
                 print('User selected something else')
-
-        label = tk.Label(self, text = f'Hello {name}, what would you like to do with your account?')
-        label.pack(side = 'top', fill = 'x', pady = 10)
 
         #withdraw button
         w_button = tk.Button(self, bg = '#3F51B5', foreground = '#ffffff', text = 'Withdraw', command = lambda: transact(1))
