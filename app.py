@@ -49,7 +49,6 @@ class App(tk.Tk):
             # the one on the top of the stacking order
             # will be the one that is visible.
             frame.grid(row = 0, column = 0, sticky = 'nsew')
-
         self.show_frame('WelcomePage')
 
     def show_frame(self, page_name):
@@ -155,8 +154,8 @@ class YourAccountPage(tk.Frame):
                 else:
                     print('Current user does not have attribute account')
                 print('User selected balance check')
-            #if user selected withdraw or deposit
-            else:
+            #if user selected withdraw
+            elif(transaction == 1):
                 #check to see if user has entered value for withdrawal_input variable
                 if(withdrawal_input.get()):
                     amt = float(withdrawal_input.get())
@@ -171,7 +170,21 @@ class YourAccountPage(tk.Frame):
                     print(current_user.account.get_balance())
                 else:
                     print('Current user does not have attribute account')
-                print('User selected something else')
+            #If transaction is a deposit
+            else:
+                if(deposit_input.get()):
+                    amt = float(deposit_input.get())
+                    print(amt)
+                    print('Got user value for amount')
+                else:
+                    print('Error with user entered amount')
+                    #check to see if user object has attribute 'account'
+                if(hasattr(current_user, 'account')):
+                    msg = current_user.account.set_balance(transaction, amt)
+                    tk.messagebox.showinfo(title = 'You Made A Transaction!', message = f'Your new balance is {msg}')
+                    print(current_user.account.get_balance())
+                else:
+                    print('Current user does not have attribute account')
 
         #header label
         header_label = tk.Label(self, text=f"Would you like to make a transaction {name}?")
@@ -186,14 +199,14 @@ class YourAccountPage(tk.Frame):
         withdrawal_label.pack()
         withdrawal_input = tk.Entry(self)
         withdrawal_input.pack(pady = 10)
-        withdrawal_confirm = tk.Button(self, pady = 10, text = 'Submit', command = lambda: transact(0))
+        withdrawal_confirm = tk.Button(self, pady = 10, text = 'Submit', command = lambda: transact(1))
         withdrawal_confirm.pack()
 
         deposit_label = tk.Label(self, text = f'How much would you like to deposit to your account?')
         deposit_label.pack()
         deposit_input = tk.Entry(self)
         deposit_input.pack(pady = 10)
-        deposit_confirm = tk.Button(self, pady = 10, text = 'Submit', command = lambda: transact(1))
+        deposit_confirm = tk.Button(self, pady = 10, text = 'Submit', command = lambda: transact(0))
         deposit_confirm.pack()
 
         label = tk.Label(self, text = f'Go To Additional Learning Activities')
@@ -206,7 +219,6 @@ class YourAccountPage(tk.Frame):
          
 #Additional Learning Features
 class AddFeatures(tk.Frame):
-
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller 
