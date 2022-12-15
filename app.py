@@ -27,6 +27,8 @@ bank = {}
 #current user, object derived from "User" class in /classes/user.py and initialized in BankPage class
 current_user = {}
 
+
+
 class App(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
@@ -37,7 +39,11 @@ class App(tk.Tk):
         container.pack(side = 'top', fill = 'both', expand = True)
         container.grid_rowconfigure(0, weight = 1)
         container.grid_columnconfigure(0, weight = 1)
-
+        container.option_add('*Label*Background', '#6200EE')
+        container.option_add('*Button*Background', '#03DAC5')
+        container.option_add('*Label*Foreground', 'white')
+        container.option_add('*Button*Width', '8')
+        container.option_add('*Button*Height', '2')
         self.frames = {}
         for F in (WelcomePage, BankPage, YourAccountPage, AddFeatures, Flashcards, CompoundInterest):
             page_name = F.__name__
@@ -49,6 +55,7 @@ class App(tk.Tk):
             # the one on the top of the stacking order
             # will be the one that is visible.
             frame.grid(row = 0, column = 0, sticky = 'nsew')
+            frame.configure(background="#6200EE")
         self.show_frame('WelcomePage')
 
     def show_frame(self, page_name):
@@ -72,30 +79,30 @@ class WelcomePage(tk.Frame):
                     name = f"{f_name} {l_name}"
                     controller.show_frame('BankPage')
                 else:
-                    messagebox.showwarning(title = 'Nope', message = 'Please enter your last name')
+                    messagebox.showwarning(title = 'Nope', message = 'Please enter your last name', font=("Helvetica", 10))
             else:
-                messagebox.showwarning(title = 'Nope', message = 'Please enter your first name')
+                messagebox.showwarning(title = 'Nope', message = 'Please enter your first name', font=("Helvetica", 10))
             return
 
-        label = tk.Label(self, text = 'Welcome To BanKids. Enter your name to get started!')
+        label = tk.Label(self, text = 'Welcome To BanKids. Enter your name to get started!', font=("Helvetica", 16,))
         label.pack(side = 'top', fill = 'x', pady = 10)
 
         #input boxes for first and last name
-        f_name_label = tk.Label(self, text = 'First name')
+        f_name_label = tk.Label(self, text = 'First name', font=("Helvetica", 12))
         f_name_label.pack()
 
         f_name_input = tk.Entry(self)
         f_name_input.pack(pady = 10)
 
         #get user input for last name
-        l_name_label = tk.Label(self, text = 'Last name')
+        l_name_label = tk.Label(self, text = 'Last name', font=("Helvetica", 12))
         l_name_label.pack()
 
         l_name_input = tk.Entry(self)
         l_name_input.pack(pady = 10)
 
         #Button to fire concat_name function, store name for user and move to BankPage screen
-        button = tk.Button(self, text = 'Submit', command = concat_name)
+        button = tk.Button(self, text = 'Submit', command = concat_name, font=("Helvetica", 10))
         button.pack(pady = 10)
 
 #Select A Bank Account
@@ -119,14 +126,14 @@ class BankPage(tk.Frame):
                 print(selected_bank)
                 controller.show_frame('YourAccountPage')
             else:
-                messagebox.showwarning(title = 'Error', message = 'Please select a bank to continue')
+                messagebox.showwarning(title = 'Error', message = 'Please select a bank to continue', font=("Helvetica", 10))
 
         #-----ERROR-----#
         #not concatenating but showing up in print statement
         welcome_msg = f'Hello {name}, pick a bank below to start your new account!'
         #-----ERROR-----#
 
-        label = tk.Label(self, text = welcome_msg)
+        label = tk.Label(self, text = welcome_msg, font=("Helvetica", 12))
         label.pack(side = 'top', fill = 'x', pady = 10)
 
         #get user input for bank selection with dropdown
@@ -134,7 +141,7 @@ class BankPage(tk.Frame):
         select_bank_box = ttk.Combobox(self, values = choices)
         select_bank_box.pack()
 
-        button = tk.Button(self, text = 'Select', command = sel_bank)
+        button = tk.Button(self, text = 'Select', command = sel_bank, font=("Helvetica", 10))
         button.pack(pady = 10)
 
 class YourAccountPage(tk.Frame):
@@ -154,8 +161,8 @@ class YourAccountPage(tk.Frame):
                 else:
                     print('Current user does not have attribute account')
                 print('User selected balance check')
-            #if user selected withdraw
-            elif(transaction == 1):
+            #if user selected withdraw or deposit
+            else:
                 #check to see if user has entered value for withdrawal_input variable
                 if(withdrawal_input.get()):
                     amt = float(withdrawal_input.get())
@@ -170,55 +177,42 @@ class YourAccountPage(tk.Frame):
                     print(current_user.account.get_balance())
                 else:
                     print('Current user does not have attribute account')
-            #If transaction is a deposit
-            else:
-                if(deposit_input.get()):
-                    amt = float(deposit_input.get())
-                    print(amt)
-                    print('Got user value for amount')
-                else:
-                    print('Error with user entered amount')
-                    #check to see if user object has attribute 'account'
-                if(hasattr(current_user, 'account')):
-                    msg = current_user.account.set_balance(transaction, amt)
-                    tk.messagebox.showinfo(title = 'You Made A Transaction!', message = f'Your new balance is {msg}')
-                    print(current_user.account.get_balance())
-                else:
-                    print('Current user does not have attribute account')
+                print('User selected something else')
 
         #header label
-        header_label = tk.Label(self, text=f"Would you like to make a transaction {name}?")
+        header_label = tk.Label(self, text=f"Would you like to make a transaction {name}?", font=("Helvetica", 12))
         header_label.pack(pady=10)
 
         #check balance button
-        cb_button = tk.Button(self, pady = '10', text = 'Check Balance', command = lambda: transact(2))
+        cb_button = tk.Button(self, pady = '10', text = 'Check Balance', font=("Helvetica", 12), width='12', command = lambda: transact(2))
         cb_button.pack()
 
         #label and input fields to enter withdrawal and deposit amounts
-        withdrawal_label = tk.Label(self, text = f'How much would you like to withdraw from your account?')
+        withdrawal_label = tk.Label(self, text = f'How much would you like to deposit to your account?', font=("Helvetica", 12))
         withdrawal_label.pack()
         withdrawal_input = tk.Entry(self)
         withdrawal_input.pack(pady = 10)
-        withdrawal_confirm = tk.Button(self, pady = 10, text = 'Submit', command = lambda: transact(1))
+        withdrawal_confirm = tk.Button(self, pady = 10, text = 'Submit', font=("Helvetica", 10), command = lambda: transact(0))
         withdrawal_confirm.pack()
 
-        deposit_label = tk.Label(self, text = f'How much would you like to deposit to your account?')
+        deposit_label = tk.Label(self, text = f'How much would you like to withdraw from your account?', font=("Helvetica", 12))
         deposit_label.pack()
         deposit_input = tk.Entry(self)
         deposit_input.pack(pady = 10)
-        deposit_confirm = tk.Button(self, pady = 10, text = 'Submit', command = lambda: transact(0))
+        deposit_confirm = tk.Button(self, pady = 10, text = 'Submit', font=("Helvetica", 10), command = lambda: transact(1))
         deposit_confirm.pack()
 
-        label = tk.Label(self, text = f'Go To Additional Learning Activities')
+        label = tk.Label(self, text = f'Go To Additional Learning Activities', font=("Helvetica", 12))
         label.pack(side = 'top', fill = 'x', pady=25)
 
-        activies_button = tk.Button(self, text = 'Learning Activites',
+        activies_button = tk.Button(self, text = 'Learning Activities', font=("Helvetica", 10), width='14',
                                     command = lambda: controller.show_frame("AddFeatures"))
         activies_button.pack()
 
          
 #Additional Learning Features
 class AddFeatures(tk.Frame):
+
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller 
