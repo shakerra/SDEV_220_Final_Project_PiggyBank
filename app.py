@@ -150,34 +150,32 @@ class YourAccountPage(tk.Frame):
                 #msg = current_user.checking_account.get_balance()
                 #tk.messagebox.showinfo(title = 'Your balance', message = msg)
                 if(hasattr(current_user, 'account')):
-                    print(current_user.account.get_balance())
+                    msg = current_user.account.get_balance()
+                    tk.messagebox.showinfo(title = 'Check Balance', message = f'Your balance is {msg}')
                 else:
                     print('Current user does not have attribute account')
                 print('User selected balance check')
-            #if user selected withdraw or depost
+            #if user selected withdraw or deposit
             else:
                 #check to see if user has entered value for withdrawal_input variable
                 if(withdrawal_input.get()):
-                    amt = withdrawal_input.get()
+                    amt = float(withdrawal_input.get())
+                    print(amt)
                     print('Got user value for amount')
                 else:
                     print('Error with user entered amount')
                 #check to see if user object has attribute 'account'
                 if(hasattr(current_user, 'account')):
-                    msg = current_user.account.set_balance(transaction, 20.50)
+                    msg = current_user.account.set_balance(transaction, amt)
                     tk.messagebox.showinfo(title = 'You Made A Transaction!', message = f'Your new balance is {msg}')
                     print(current_user.account.get_balance())
                 else:
                     print('Current user does not have attribute account')
                 print('User selected something else')
 
-        #withdraw button
-        w_button = tk.Button(self, bg = '#3F51B5', foreground = '#ffffff', text = 'Withdraw', command = lambda: transact(1))
-        w_button.pack()
-
-        #deposit button
-        d_button = tk.Button(self, pady = '10', text = 'Depost', command = lambda: transact(0))
-        d_button.pack()
+        #header label
+        header_label = tk.Label(self, text=f"Would you like to make a transaction {name}?")
+        header_label.pack(pady=10)
 
         #check balance button
         cb_button = tk.Button(self, pady = '10', text = 'Check Balance', command = lambda: transact(2))
