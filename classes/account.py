@@ -1,4 +1,3 @@
-#account class - temporary
 class Account:
     def __init__(self, balance, type, bank):
         self.balance = balance

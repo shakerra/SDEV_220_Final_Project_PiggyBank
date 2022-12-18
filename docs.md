@@ -34,7 +34,3 @@ Helpful Git Commands
 
     git checkout [example-branch]
         Basically the "cd" command for git, moves you into the branch you choose, replace [example branch]
-
-# Directories
-
-### classes
