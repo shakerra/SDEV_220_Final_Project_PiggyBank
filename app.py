@@ -1,10 +1,11 @@
 #import tkinter modules
 import tkinter as tk
 from tkinter import *
+from tkinter.ttk import *
 from tkinter import ttk
 from tkinter import messagebox
 from random import randint
-
+import math
 #import classes from relative files
 from classes.user import User
 from classes.account import Account
@@ -27,8 +28,6 @@ bank = {}
 #current user, object derived from "User" class in /classes/user.py and initialized in BankPage class
 current_user = {}
 
-
-
 class App(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
@@ -42,10 +41,11 @@ class App(tk.Tk):
         container.option_add('*Label*Background', '#6200EE')
         container.option_add('*Button*Background', '#03DAC5')
         container.option_add('*Label*Foreground', 'white')
-        container.option_add('*Button*Width', '8')
-        container.option_add('*Button*Height', '2')
+
+        
+
         self.frames = {}
-        for F in (WelcomePage, BankPage, YourAccountPage, AddFeatures, Flashcards, CompoundInterest):
+        for F in (WelcomePage, BankPage, YourAccountPage, AddFeatures, LoansAndCredits,  Flashcards, LoanEligibility, CreditEligibility, CompoundInterest):
             page_name = F.__name__
             frame = F(parent = container, controller = self)
             self.frames[page_name] = frame
@@ -57,6 +57,7 @@ class App(tk.Tk):
             frame.grid(row = 0, column = 0, sticky = 'nsew')
             frame.configure(background="#6200EE")
         self.show_frame('WelcomePage')
+
 
     def show_frame(self, page_name):
         frame = self.frames[page_name]
@@ -79,30 +80,36 @@ class WelcomePage(tk.Frame):
                     name = f"{f_name} {l_name}"
                     controller.show_frame('BankPage')
                 else:
-                    messagebox.showwarning(title = 'Nope', message = 'Please enter your last name', font=("Helvetica", 10))
+                    messagebox.showwarning(title = 'Nope', message = 'Please enter your last name')
             else:
-                messagebox.showwarning(title = 'Nope', message = 'Please enter your first name', font=("Helvetica", 10))
+                messagebox.showwarning(title = 'Nope', message = 'Please enter your first name')
             return
 
-        label = tk.Label(self, text = 'Welcome To BanKids. Enter your name to get started!', font=("Helvetica", 16,))
+        label = tk.Label(self, text = 'Welcome To BanKids.', font=("Helvetica", 20))
         label.pack(side = 'top', fill = 'x', pady = 10)
+        
+        label = tk.Label(self, text = 'Enter your name to get started!', font=("Helvetica", 16))
+        label.pack(side = 'top', fill = 'x', pady = 10)
+    
 
         #input boxes for first and last name
-        f_name_label = tk.Label(self, text = 'First name', font=("Helvetica", 12))
+        f_name_label = tk.Label(self, text = 'First name', font=("Helvetica", 14))
+        
         f_name_label.pack()
 
-        f_name_input = tk.Entry(self)
+        f_name_input = tk.Entry(self, font=("Helvetica", 14))
         f_name_input.pack(pady = 10)
-
+        
+        
         #get user input for last name
-        l_name_label = tk.Label(self, text = 'Last name', font=("Helvetica", 12))
+        l_name_label = tk.Label(self, text = 'Last name', font=("Helvetica", 14))
         l_name_label.pack()
 
-        l_name_input = tk.Entry(self)
+        l_name_input = tk.Entry(self, font=("Helvetica", 14))
         l_name_input.pack(pady = 10)
-
+        
         #Button to fire concat_name function, store name for user and move to BankPage screen
-        button = tk.Button(self, text = 'Submit', command = concat_name, font=("Helvetica", 10))
+        button = tk.Button(self, text = 'Submit', font=("Helvetica", 14), command = concat_name)
         button.pack(pady = 10)
 
 #Select A Bank Account
@@ -126,22 +133,22 @@ class BankPage(tk.Frame):
                 print(selected_bank)
                 controller.show_frame('YourAccountPage')
             else:
-                messagebox.showwarning(title = 'Error', message = 'Please select a bank to continue', font=("Helvetica", 10))
+                messagebox.showwarning(title = 'Error', message = 'Please select a bank to continue')
 
         #-----ERROR-----#
         #not concatenating but showing up in print statement
-        welcome_msg = f'Hello {name}, pick a bank below to start your new account!'
+        welcome_msg = f'Please select a bank for your preferred bank!'
         #-----ERROR-----#
 
-        label = tk.Label(self, text = welcome_msg, font=("Helvetica", 12))
+        label = tk.Label(self, text = welcome_msg, font=("Helvetica", 20))
         label.pack(side = 'top', fill = 'x', pady = 10)
 
         #get user input for bank selection with dropdown
         choices = ['Chase', 'Fifth Third', 'First Midwest']
-        select_bank_box = ttk.Combobox(self, values = choices)
+        select_bank_box = ttk.Combobox(self, values = choices, font=("Helvetica", 16))
         select_bank_box.pack()
 
-        button = tk.Button(self, text = 'Select', command = sel_bank, font=("Helvetica", 10))
+        button = tk.Button(self, text = 'Select', font=("Helvetica", 16), command = sel_bank)
         button.pack(pady = 10)
 
 class YourAccountPage(tk.Frame):
@@ -156,44 +163,44 @@ class YourAccountPage(tk.Frame):
                 #msg = current_user.checking_account.get_balance()
                 #tk.messagebox.showinfo(title = 'Your balance', message = msg)
                 if(hasattr(current_user, 'account')):
-                    msg = current_user.account.get_balance()
-                    tk.messagebox.showinfo(title = 'Check Balance', message = f'Your balance is {msg}')
+                    print(current_user.account.get_balance())
                 else:
                     print('Current user does not have attribute account')
                 print('User selected balance check')
-            #if user selected withdraw or deposit
+            #if user selected withdraw or depost
             else:
                 #check to see if user has entered value for withdrawal_input variable
                 if(withdrawal_input.get()):
-                    amt = float(withdrawal_input.get())
-                    print(amt)
+                    amt = withdrawal_input.get()
                     print('Got user value for amount')
                 else:
                     print('Error with user entered amount')
                 #check to see if user object has attribute 'account'
                 if(hasattr(current_user, 'account')):
-                    msg = current_user.account.set_balance(transaction, amt)
+                    msg = current_user.account.set_balance(transaction, 20.50)
                     tk.messagebox.showinfo(title = 'You Made A Transaction!', message = f'Your new balance is {msg}')
                     print(current_user.account.get_balance())
                 else:
                     print('Current user does not have attribute account')
                 print('User selected something else')
 
+
         #header label
-        header_label = tk.Label(self, text=f"Would you like to make a transaction {name}?", font=("Helvetica", 12))
-        header_label.pack(pady=10)
+        header_label = tk.Label(self, text=f"Welcome to your account", font=("Helvetica", 20))
+        header_label.pack(pady=30)
 
         #check balance button
-        cb_button = tk.Button(self, pady = '10', text = 'Check Balance', font=("Helvetica", 12), width='12', command = lambda: transact(2))
-        cb_button.pack()
+        half = 0.3
+        cb_button = tk.Button(self, pady = '10', text = 'Check Balance', font=("Helvetica", 14), width=20, command = lambda: transact(2))
+        cb_button.pack(pady = 20)
 
         #label and input fields to enter withdrawal and deposit amounts
-        withdrawal_label = tk.Label(self, text = f'How much would you like to deposit to your account?', font=("Helvetica", 12))
+        withdrawal_label = tk.Label(self, text = f'How much would you like to deposit to your account?', font=("Helvetica", 12),)
         withdrawal_label.pack()
         withdrawal_input = tk.Entry(self)
         withdrawal_input.pack(pady = 10)
-        withdrawal_confirm = tk.Button(self, pady = 10, text = 'Submit', font=("Helvetica", 10), command = lambda: transact(0))
-        withdrawal_confirm.pack()
+        withdrawal_confirm = tk.Button(self, pady = 10, text = 'Submit', font=("Helvetica", 12), width='20', height=1, command = lambda: transact(0))
+        withdrawal_confirm.pack(pady = 20)
 
         deposit_label = tk.Label(self, text = f'How much would you like to withdraw from your account?', font=("Helvetica", 12))
         deposit_label.pack()
@@ -208,7 +215,10 @@ class YourAccountPage(tk.Frame):
         activies_button = tk.Button(self, text = 'Learning Activities', font=("Helvetica", 10), width='14',
                                     command = lambda: controller.show_frame("AddFeatures"))
         activies_button.pack()
-
+        
+        borrowing_button = tk.Button(self, text = 'Loans and Credit Cards',
+                                    command = lambda: controller.show_frame("LoansAndCredits"))
+        borrowing_button.pack(pady = 10)
          
 #Additional Learning Features
 class AddFeatures(tk.Frame):
@@ -233,6 +243,30 @@ class AddFeatures(tk.Frame):
 
         #return to your account
         returnb = tk.Button(self, text = 'Go Back to Your Account',
+                                    command = lambda: controller.show_frame("YourAccountPage"))
+        returnb.pack(pady=100)
+
+class LoansAndCredits(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller 
+
+        label = tk.Label(self, text="Loans And Credits", font=("Helvetica", 20))
+        label.pack(side="top", fill="x", pady=10)
+
+
+
+        #open Loan Approval
+        loan_approval = tk.Button(self, text="Personal Loans", command= lambda: controller.show_frame("LoanEligibility"))
+        loan_approval.pack(pady = 20)
+
+        #open Credit approval 
+        credit_approval = tk.Button(self, text="Credit Cards", command= lambda: controller.show_frame("CreditEligibility"))
+        credit_approval.pack(pady=20)
+
+        #return to your account
+        returnb = tk.Button(self, text = 'Back to Your Account',
                                     command = lambda: controller.show_frame("YourAccountPage"))
         returnb.pack(pady=100)
 
@@ -313,6 +347,156 @@ class Flashcards(tk.Frame):
                                     command = lambda: controller.show_frame("AddFeatures"))
         returnb.pack(pady=25)
 
+
+class CreditEligibility(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller 
+
+        from app import name
+        def answer():
+            
+            
+            try:
+                int(bank_balance.get())
+                
+                try:
+                    income = float(monthly_income.get())
+                    balance = float(bank_balance.get())
+                    
+                    Approvalmt = (balance/2) + (income/3)
+                    
+                    answer_label.config(text = "You are pre approved for %.2f" % Approvalmt, font=("Helvetica", 16), wraplength=500, justify="center")
+                
+                except ValueError:
+                    answer_label.config(text=f"Check the values and try again", wraplength=500, justify="center")
+                
+                
+                
+            except ValueError:
+                answer_label.config(text=f"Check the values and try again", wraplength=500, justify="center")
+                       
+            
+        page_title = Label(self, text="CREDIT PRE-APPROVAL", font=("Helvetica", 16, "bold"), wraplength=700, justify="center")
+        page_title.pack(pady=10)
+        
+
+        
+        
+        word_bank = Label(self, text="Welcome to the credit card preapproval page", font=("Helvetica", 14), justify="center")
+        #word_bank.grid(row = 4, colum = 0, pady = 20)
+        word_bank.pack(pady = 10)
+        
+        Balance_title = Label(self, text="Bank balance", font=("Helvetica", 12), wraplength=500, justify="center")
+        Balance_title.pack(pady=10)
+
+        bank_balance = Entry(self, font=("Helvetica", 18))
+        bank_balance.pack(pady = 10)
+        
+        income_title = Label(self, text="Monthly Income", font=("Helvetica", 12), wraplength=500, justify="center")
+        income_title.pack(pady=10)
+        
+        monthly_income = Entry(self, font=("Helvetica", 18))
+        monthly_income.pack(pady = 10)
+
+        answer_label = Label(self, text="Pre-approved amount will appear here.", font=("Helvetica", 12), wraplength=500, justify="center")
+        answer_label.pack(pady= 10)
+        
+        
+        
+        #create buttons
+        button_frame = Frame(self)
+        button_frame.pack()
+
+        answer_button = Button(button_frame, text="Check Pre-Approved Amount", command=answer)
+        answer_button.grid(pady = 10)
+        
+
+        #return to your account
+        returnb = tk.Button(self, text = 'Back to Your Account',
+                                    command = lambda: controller.show_frame("YourAccountPage"))
+        returnb.pack(side=tk.LEFT, pady=25, padx = 25)
+        
+        #Return to Loans And Credits
+        
+        returnb = tk.Button(self, text = 'Back to Loans And Credit',
+                                    command = lambda: controller.show_frame("LoansAndCredits"))
+        returnb.pack(side=tk.LEFT, pady=25, padx = 25)
+
+
+class LoanEligibility(tk.Frame):
+  def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller 
+
+
+        def answer():
+            
+            
+            try:
+                int(bank_balance.get())
+                
+                try:
+                    income = float(monthly_income.get())
+                    balance = float(bank_balance.get())
+                    
+                    Approvalmt = (balance) + (income*3)
+                    
+                    answer_label.config(text = "You are pre approved for %.2f" % Approvalmt, font=("Helvetica", 16), wraplength=500, justify="center")
+                
+                except ValueError:
+                    answer_label.config(text=f"Check the values and try again", wraplength=500, justify="center")
+                
+                
+                
+            except ValueError:
+                answer_label.config(text=f"Check the values and try again", wraplength=500, justify="center")
+                       
+            
+        page_title = Label(self, text="LOAN PRE-APPROVAL", font=("Helvetica", 16, "bold"), wraplength=700, justify="center")
+        page_title.pack(pady=10)
+        
+        word_bank = Label(self, text="Welcome to the personal loans preapproval page", font=("Helvetica", 14), justify="center")
+        #word_bank.grid(row = 4, colum = 0, pady = 20)
+        word_bank.pack(pady = 10)
+        
+        Balance_title = Label(self, text="Bank balance", font=("Helvetica", 12), wraplength=500, justify="center")
+        Balance_title.pack(pady=10)
+
+        bank_balance = Entry(self, font=("Helvetica", 18))
+        bank_balance.pack(pady = 10)
+        
+        income_title = Label(self, text="Monthly Income", font=("Helvetica", 12), wraplength=500, justify="center")
+        income_title.pack(pady=10)
+        
+        monthly_income = Entry(self, font=("Helvetica", 18))
+        monthly_income.pack(pady = 10)
+
+        answer_label = Label(self, text="Pre-approved amount will appear here.", font=("Helvetica", 12), wraplength=500, justify="center")
+        answer_label.pack(pady= 10)
+        
+        
+        
+        #create buttons
+        button_frame = Frame(self)
+        button_frame.pack()
+
+        answer_button = Button(button_frame, text="Check Pre-Approved Amount", command=answer)
+        answer_button.grid(pady = 10)
+        
+
+        #return to your account
+        returnb = tk.Button(self, text = 'Back to Your Account',
+                                    command = lambda: controller.show_frame("YourAccountPage"))
+        returnb.pack(side=tk.LEFT, pady=25, padx = 25)
+        
+        #Return to Loans And Credits
+        
+        returnb = tk.Button(self, text = 'Back to Loans And Credit',
+                                    command = lambda: controller.show_frame("LoansAndCredits"))
+        returnb.pack(side=tk.LEFT, pady=25, padx = 25)
+        
+        
 #Compound Interest Feature
 class CompoundInterest(tk.Frame):
     def __init__(self, parent, controller):
@@ -326,6 +510,6 @@ class CompoundInterest(tk.Frame):
 
 if __name__ == '__main__':
     app = App()
-    app.geometry('600x600')
+    app.geometry('600x900')
     app.title('BanKids 💵')
     app.mainloop()
