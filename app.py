@@ -5,7 +5,8 @@ from tkinter.ttk import *
 from tkinter import ttk
 from tkinter import messagebox
 from random import randint
-import math
+from math import *
+
 #import classes from relative files
 from classes.user import User
 from classes.account import Account
@@ -49,7 +50,7 @@ class App(tk.Tk):
             page_name = F.__name__
             frame = F(parent = container, controller = self)
             self.frames[page_name] = frame
-            print(current_user)
+            
 
             # put all of the pages in the same location;
             # the one on the top of the stacking order
@@ -77,7 +78,9 @@ class WelcomePage(tk.Frame):
             l_name = l_name_input.get()
             if(f_name != ''):
                 if(l_name != ''):
+                    global name
                     name = f"{f_name} {l_name}"
+                    print (name)
                     controller.show_frame('BankPage')
                 else:
                     messagebox.showwarning(title = 'Nope', message = 'Please enter your last name')
@@ -138,7 +141,7 @@ class BankPage(tk.Frame):
         #-----ERROR-----#
         #not concatenating but showing up in print statement
         welcome_msg = f'Please select a bank for your preferred bank!'
-        #-----ERROR-----#
+        
 
         label = tk.Label(self, text = welcome_msg, font=("Helvetica", 20))
         label.pack(side = 'top', fill = 'x', pady = 10)
@@ -155,7 +158,7 @@ class YourAccountPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-
+        
         def transact(transaction):
             amt = 0
             msg = ''
@@ -163,51 +166,53 @@ class YourAccountPage(tk.Frame):
                 #msg = current_user.checking_account.get_balance()
                 #tk.messagebox.showinfo(title = 'Your balance', message = msg)
                 if(hasattr(current_user, 'account')):
-                    print(current_user.account.get_balance())
+                    msg = current_user.account.get_balance()
+                    tk.messagebox.showinfo(title = 'Check Balance', message = f'Your balance is {msg}')
                 else:
                     print('Current user does not have attribute account')
                 print('User selected balance check')
-            #if user selected withdraw or depost
+            #if user selected withdraw or deposit
             else:
                 #check to see if user has entered value for withdrawal_input variable
-                if(withdrawal_input.get()):
-                    amt = withdrawal_input.get()
+                if(deposit_input.get()):
+                    amt = float(deposit_input.get())
+                    print(amt)
                     print('Got user value for amount')
+                    deposit_input.delete(0, END)
                 else:
                     print('Error with user entered amount')
                 #check to see if user object has attribute 'account'
                 if(hasattr(current_user, 'account')):
-                    msg = current_user.account.set_balance(transaction, 20.50)
+                    msg = current_user.account.set_balance(transaction, amt)
                     tk.messagebox.showinfo(title = 'You Made A Transaction!', message = f'Your new balance is {msg}')
                     print(current_user.account.get_balance())
                 else:
                     print('Current user does not have attribute account')
                 print('User selected something else')
-
-
+    
+            
         #header label
         header_label = tk.Label(self, text=f"Welcome to your account", font=("Helvetica", 20))
         header_label.pack(pady=30)
 
         #check balance button
-        half = 0.3
-        cb_button = tk.Button(self, pady = '10', text = 'Check Balance', font=("Helvetica", 14), width=20, command = lambda: transact(2))
+        cb_button = tk.Button(self, text = 'Check Balance', font=("Helvetica", 14), command = lambda: transact(2))
         cb_button.pack(pady = 20)
 
         #label and input fields to enter withdrawal and deposit amounts
-        withdrawal_label = tk.Label(self, text = f'How much would you like to deposit to your account?', font=("Helvetica", 12),)
-        withdrawal_label.pack()
-        withdrawal_input = tk.Entry(self)
-        withdrawal_input.pack(pady = 10)
-        withdrawal_confirm = tk.Button(self, pady = 10, text = 'Submit', font=("Helvetica", 12), width='20', height=1, command = lambda: transact(0))
-        withdrawal_confirm.pack(pady = 20)
-
-        deposit_label = tk.Label(self, text = f'How much would you like to withdraw from your account?', font=("Helvetica", 12))
+        deposit_label = tk.Label(self, text = f'How much would you like to deposit to your account?', font=("Helvetica", 15),)
         deposit_label.pack()
-        deposit_input = tk.Entry(self)
+        deposit_input = tk.Entry(self, width=30)
         deposit_input.pack(pady = 10)
-        deposit_confirm = tk.Button(self, pady = 10, text = 'Submit', font=("Helvetica", 10), command = lambda: transact(1))
-        deposit_confirm.pack()
+        deposit_confirm = tk.Button(self, text = 'Submit', font=("Helvetica", 12), command = lambda: transact(0))
+        deposit_confirm.pack(pady = 20)
+
+        withdrawal_label = tk.Label(self, text = f'How much would you like to withdraw from your account?', font=("Helvetica", 15))
+        withdrawal_label.pack()
+        withdrawal_input = tk.Entry(self, width=30)
+        withdrawal_input.pack(pady = 10)
+        withdrawal_confirm = tk.Button(self, text = 'Submit', font=("Helvetica", 10), command = lambda: transact(1))
+        withdrawal_confirm.pack()
 
         label = tk.Label(self, text = f'Go To Additional Learning Activities', font=("Helvetica", 12))
         label.pack(side = 'top', fill = 'x', pady=25)
@@ -254,8 +259,6 @@ class LoansAndCredits(tk.Frame):
 
         label = tk.Label(self, text="Loans And Credits", font=("Helvetica", 20))
         label.pack(side="top", fill="x", pady=10)
-
-
 
         #open Loan Approval
         loan_approval = tk.Button(self, text="Personal Loans", command= lambda: controller.show_frame("LoanEligibility"))
@@ -314,13 +317,13 @@ class Flashcards(tk.Frame):
                 messagebox.showwarning(title = 'Nope', message = 'Please enter an answer')
                        
             
-        instructions = Label(self, text="Please match the following words with the correct definition ", font=("Helvetica", 16), wraplength=700, justify="center")
+        instructions = Label(self, text="Please match the following words with the correct definition ", font=("Helvetica", 16), wraplength=700, justify="center", background='#6200EE', foreground='white')
         instructions.pack(pady=10)
         
-        word_bank = Label(self, text="Savings, Budget, Loan, Deposit, Interest, Credit, Investment, Stock, Credit score, Bank", font=("Helvetica", 10), justify="center")
+        word_bank = Label(self, text="Savings, Budget, Loan, Deposit, Interest, Credit, Investment, Stock, Credit score, Bank", font=("Helvetica", 10), justify="center", background='#6200EE', foreground='white')
         word_bank.pack()
         
-        literacy_word = Label(self, text="", font=("Helvetica", 12), wraplength=500, justify="center")
+        literacy_word = Label(self, text="", font=("Helvetica", 12), wraplength=500, justify="center", background='#6200EE', foreground='white')
         literacy_word.pack(pady=80)
 
         my_entry = Entry(self, font=("Helvetica", 18))
@@ -377,29 +380,29 @@ class CreditEligibility(tk.Frame):
                 answer_label.config(text=f"Check the values and try again", wraplength=500, justify="center")
                        
             
-        page_title = Label(self, text="CREDIT PRE-APPROVAL", font=("Helvetica", 16, "bold"), wraplength=700, justify="center")
+        page_title = Label(self, text="CREDIT PRE-APPROVAL", font=("Helvetica", 16, "bold"), wraplength=700, justify="center", background='#6200EE', foreground='white')
         page_title.pack(pady=10)
         
 
         
         
-        word_bank = Label(self, text="Welcome to the credit card preapproval page", font=("Helvetica", 14), justify="center")
+        word_bank = Label(self, text="Welcome to the credit card preapproval page", font=("Helvetica", 14), justify="center", background='#6200EE', foreground='white')
         #word_bank.grid(row = 4, colum = 0, pady = 20)
         word_bank.pack(pady = 10)
         
-        Balance_title = Label(self, text="Bank balance", font=("Helvetica", 12), wraplength=500, justify="center")
+        Balance_title = Label(self, text="Bank balance", font=("Helvetica", 12), wraplength=500, justify="center", background='#6200EE', foreground='white')
         Balance_title.pack(pady=10)
 
         bank_balance = Entry(self, font=("Helvetica", 18))
         bank_balance.pack(pady = 10)
         
-        income_title = Label(self, text="Monthly Income", font=("Helvetica", 12), wraplength=500, justify="center")
+        income_title = Label(self, text="Monthly Income", font=("Helvetica", 12), wraplength=500, justify="center", background='#6200EE', foreground='white')
         income_title.pack(pady=10)
         
         monthly_income = Entry(self, font=("Helvetica", 18))
         monthly_income.pack(pady = 10)
 
-        answer_label = Label(self, text="Pre-approved amount will appear here.", font=("Helvetica", 12), wraplength=500, justify="center")
+        answer_label = Label(self, text="Pre-approved amount will appear here.", font=("Helvetica", 12), wraplength=500, justify="center", )
         answer_label.pack(pady= 10)
         
         
@@ -453,26 +456,26 @@ class LoanEligibility(tk.Frame):
                 answer_label.config(text=f"Check the values and try again", wraplength=500, justify="center")
                        
             
-        page_title = Label(self, text="LOAN PRE-APPROVAL", font=("Helvetica", 16, "bold"), wraplength=700, justify="center")
+        page_title = Label(self, text="LOAN PRE-APPROVAL", font=("Helvetica", 16, "bold"), wraplength=700, justify="center", background='#6200EE', foreground='white')
         page_title.pack(pady=10)
         
-        word_bank = Label(self, text="Welcome to the personal loans preapproval page", font=("Helvetica", 14), justify="center")
+        word_bank = Label(self, text="Welcome to the personal loans preapproval page", font=("Helvetica", 14), justify="center", background='#6200EE', foreground='white')
         #word_bank.grid(row = 4, colum = 0, pady = 20)
         word_bank.pack(pady = 10)
         
-        Balance_title = Label(self, text="Bank balance", font=("Helvetica", 12), wraplength=500, justify="center")
+        Balance_title = Label(self, text="Bank balance", font=("Helvetica", 12), wraplength=500, justify="center", background='#6200EE', foreground='white')
         Balance_title.pack(pady=10)
 
         bank_balance = Entry(self, font=("Helvetica", 18))
         bank_balance.pack(pady = 10)
         
-        income_title = Label(self, text="Monthly Income", font=("Helvetica", 12), wraplength=500, justify="center")
+        income_title = Label(self, text="Monthly Income", font=("Helvetica", 12), wraplength=500, justify="center", background='#6200EE', foreground='white')
         income_title.pack(pady=10)
         
         monthly_income = Entry(self, font=("Helvetica", 18))
         monthly_income.pack(pady = 10)
 
-        answer_label = Label(self, text="Pre-approved amount will appear here.", font=("Helvetica", 12), wraplength=500, justify="center")
+        answer_label = Label(self, text="Pre-approved amount will appear here.", font=("Helvetica", 12), wraplength=500, justify="center", background='#6200EE', foreground='white')
         answer_label.pack(pady= 10)
         
         
@@ -502,11 +505,74 @@ class CompoundInterest(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller 
+        
+        #funtion for clearing all fields
+        def clear_all():
+            principal_entry.delete(0, END)
+            rate_entry.delete(0, END)
+            time_entry.delete(0, END)
+            compound_entry.delete(0, END)
+
+            #focus on principal entry box
+            principal_entry.focus_set()
+        
+        #calculate compount interest
+        def calculate_ci():
+            #get principal from entry box
+            principal = int(principal_entry.get())
+            rate = float(rate_entry.get())  
+            time = int(time_entry.get())  
+
+            #calculation
+            CI = principal * (pow((1 + rate / 100), time))
+
+            #round compound interest to 2 decimals
+            CI_result = round(CI, 2)
+            #inserting value in the text entry box
+            compound_entry.insert(10, CI_result)
+        
+        #principal label
+        principal_label = Label(self, text="Principal Amount($):", font=("Helvetica", 13), background='#6200EE', foreground='white')
+        #rate label
+        rate_label = Label(self, text="Rate of Interest(%):", font=("Helvetica", 13), background='#6200EE', foreground='white')
+        #time label
+        time_label = Label(self, text="Time(years):", font=("Helvetica", 13),background='#6200EE', foreground='white') 
+        #compound interest label
+        ci_label = Label(self, text="Compound Interest:", font=("Helvetica", 13), background='#6200EE', foreground='white')
+
+        principal_label.grid(row=1, column=0, padx=10, pady=10)
+        rate_label.grid(row=2, column=0, padx=10, pady=10)
+        time_label.grid(row=3, column=0, padx=10, pady=10)
+        ci_label.grid(row=5, column=0, padx=10, pady=10)
+
+        #Create entry box
+        principal_entry = Entry(self)
+        rate_entry = Entry(self)
+        time_entry = Entry(self)
+        compound_entry = Entry(self)
+
+
+        principal_entry.grid(row=1, column=1, padx=10, pady=10)
+        rate_entry.grid(row=2, column=1, padx=10, pady=10)
+        time_entry.grid(row=3, column=1, padx=10, pady=10)
+        compound_entry.grid(row=5, column=1, padx=10, pady=10)
+
+        #create a submit button linked to calculate function
+        calculateCI_but = Button(self, text= "Submit", command=calculate_ci)
+
+        #create a clear button linked to clear function
+        clear_button = Button(self, text= "Clear",  command=clear_all)
+
+        calculateCI_but.grid(row=4, column=1, pady=10)
+        clear_button.grid(row=6, column=1, pady=10)
 
         #return to your account
-        returnb = tk.Button(self, text = 'Go Back to Learning Activities',
+        returnb = tk.Button(self, text = 'Go Back to Learning Activities', width=25,
                                     command = lambda: controller.show_frame("AddFeatures"))
-        returnb.pack(pady=25)
+        returnb.grid(row=30, column=1, pady=75)
+        
+        
+        
 
 if __name__ == '__main__':
     app = App()
