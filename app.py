@@ -11,14 +11,6 @@ from math import *
 from classes.user import User
 from classes.account import Account
 
-#styling variables
-#colors
-c_dark  = '#121212'
-c_purp  = '#3700B3'
-c_error = '#CF6679'
-c_black = '#000000'
-c_white = '#FFFFFF'
-
 #global vars
 #concat first and last name
 name = ''
@@ -43,22 +35,18 @@ class App(tk.Tk):
         container.option_add('*Button*Background', '#03DAC5')
         container.option_add('*Label*Foreground', 'white')
 
-        
-
         self.frames = {}
         for F in (WelcomePage, BankPage, YourAccountPage, AddFeatures, LoansAndCredits,  Flashcards, LoanEligibility, CreditEligibility, CompoundInterest):
             page_name = F.__name__
             frame = F(parent = container, controller = self)
             self.frames[page_name] = frame
             
-
             # put all of the pages in the same location;
             # the one on the top of the stacking order
             # will be the one that is visible.
             frame.grid(row = 0, column = 0, sticky = 'nsew')
             frame.configure(background="#6200EE")
         self.show_frame('WelcomePage')
-
 
     def show_frame(self, page_name):
         frame = self.frames[page_name]
