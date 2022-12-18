@@ -173,12 +173,17 @@ class YourAccountPage(tk.Frame):
                 print('User selected balance check')
             #if user selected withdraw or deposit
             else:
-                #check to see if user has entered value for withdrawal_input variable
+                #check to see if user has entered value for deposit_input variable
                 if(deposit_input.get()):
                     amt = float(deposit_input.get())
                     print(amt)
                     print('Got user value for amount')
                     deposit_input.delete(0, END)
+                elif(withdrawal_input.get()):
+                    amt = float(withdrawal_input.get())
+                    print(amt)
+                    print('Got user value for amount')
+                    withdrawal_input.delete(0, END)
                 else:
                     print('Error with user entered amount')
                 #check to see if user object has attribute 'account'
